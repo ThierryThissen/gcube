@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:gcube3/globals/display.dart' as dsp;
 import 'package:gcube3/globals/state.dart' as state;
 import 'package:flutter/material.dart';
@@ -36,6 +37,9 @@ class AnimatedStack {
         child: it,
       ),
     );
+    stack.sort((a, b) {
+      return (a.priority < b.priority) ? 1 : 0;
+    });
     _startTimer(id);
   }
 
@@ -54,6 +58,19 @@ class AnimatedStack {
         });
         animStates.remove(id);
       });
+    });
+  }
+
+  void setToTopPriority(String id) {
+    if (stack.isEmpty || !ids.contains(id)) return;
+    int it = stack.lastIndexOf(
+      stack.firstWhere((StackAnimated a) {
+        return a.id == id;
+      }),
+    );
+
+    state.rebuildMainStack(() {
+      stack.insert(stack.length - 1, stack.removeAt(it));
     });
   }
 
@@ -112,12 +129,10 @@ class _StackAnimated extends State<StackAnimated> {
       child: OrientationBuilder(
         builder: (c, o) {
           return AnimatedContainer(
-            width: dsp.eqPx * dsp.eqPxW,
-            height: dsp.eqPx * dsp.eqPxH,
             duration: widget.duration,
             alignment: AlignmentGeometry.xy(
-              dsp.data.alignX(widget.positions[0].dx),
-              dsp.data.alignY(widget.positions[0].dy),
+              dsp.data.alignX((widget.child as AnimatedWindowGCube).position.dx),
+              dsp.data.alignY((widget.child as AnimatedWindowGCube).position.dy),
             ),
             child: widget.child,
           );
@@ -125,4 +140,12 @@ class _StackAnimated extends State<StackAnimated> {
       ),
     );
   }
+}
+
+abstract class AnimatedWindowGCube {
+  @visibleForOverriding
+  Offset get position => Offset(0, 0);
+
+  @visibleForOverriding
+  Offset get size => Offset(10, 10);
 }

@@ -15,6 +15,7 @@ bool mobile = false;
 bool square = false;
 bool tablet = false;
 bool projectWindowOpen = true;
+bool encoderWindowOpen = false;
 bool createProject = false;
 
 void serialize() async {

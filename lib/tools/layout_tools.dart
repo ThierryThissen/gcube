@@ -317,5 +317,6 @@ Widget gcubeButton(VoidCallback onPressed, IconData icon, {double? iconSize}) {
 }
 
 TextStyle titleL() => TextStyle(fontSize: dsp.eqPx * ft.l, color: Colors.white);
+TextStyle L() => TextStyle(fontSize: dsp.eqPx * ft.m, color: Colors.white);
 TextStyle capitalFirst({double? size, Color? color}) => TextStyle(fontSize: size ?? dsp.eqPx * ft.xxl, color: color ?? Colors.white);
 TextStyle capitalAfter({double? size, Color? color}) => TextStyle(fontSize: size ?? dsp.eqPx * ft.l, color: color ?? Colors.white);

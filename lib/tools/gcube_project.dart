@@ -1,3 +1,4 @@
+import 'package:gcube3/tools/encoder_row.dart';
 import 'package:uuid/uuid.dart';
 
 class GcubeProject {
@@ -37,4 +38,6 @@ class GcubeProject {
 
 
   static bool _validId(String it) => _projects.keys.contains(it);
+
+  List<EncoderRow> encodedTrees = [];
 }

@@ -51,7 +51,7 @@ void popupMessage({
   );
 }
 
-class PopupMessage extends StatelessWidget {
+class PopupMessage extends StatelessWidget implements stack.AnimatedWindowGCube {
   final String? id;
   final String? title;
   final Icon? leadingSymbol;
@@ -86,19 +86,22 @@ class PopupMessage extends StatelessWidget {
   });
 
   @override
+  Offset get position => mode.projectWindowOpen
+      ? Offset(dsp.data.alignX(0), dsp.data.alignY(0))
+      : Offset(dsp.data.alignX(dsp.data.eqAlignLeft), dsp.data.alignY(dsp.data.eqAlignTop));
+
+  @override
+  Offset get size => Offset(
+    mode.projectWindowOpen ? dsp.data.eqMaxWindowWidth * dsp.eqPx : 150 * dsp.eqPx,
+    (mode.projectWindowOpen ? dsp.data.eqMaxWindowHeight * dsp.eqPx : 30 * dsp.eqPx) - dsp.data.insetBot,
+  );
+
+  @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
       builder: (c, o) {
         double cWidth = width ?? dsp.eqPx * 70;
         double cHeight = height ?? (dsp.data.orientation == Orientation.landscape && dsp.data.showKeyboard ? dsp.eqPx * 20 : dsp.eqPx * 70);
-        /*if (cHeight > 95 * dsp.eqPx && dsp.data.orientation == Orientation.landscape) {
-          cHeight = dsp.eqPx * 95;
-        }
-        if (cWidth > 95 * dsp.eqPx && dsp.data.orientation == Orientation.portrait) {
-          cWidth = dsp.eqPx * 70;
-        }
-        if (dsp.eqPx * dsp.data.eqMaxWindowHeight - dsp.data.insetBot < cHeight) cHeight -= dsp.data.insetBot;
-        */
         return Card(
           margin: EdgeInsetsGeometry.zero,
           shape: RoundedRectangleBorder(
@@ -151,12 +154,13 @@ class PopupMessage extends StatelessWidget {
                   ],
                 ),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         lt.GcubeScrollView(
+                          
                           height: cHeight - (mode.keyboardExpanded ? dsp.eqPx : dsp.eqPx * 50),
                           width: cWidth - dsp.eqPx * 5,
                           child:
