@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gcube3/globals/classes_circonference.dart';
 import 'package:gcube3/globals/colors.dart' as colors;
@@ -17,7 +17,9 @@ import 'package:gcube3/globals/colors.dart' as color;
 import 'package:gcube3/globals/anim_data.dart' as anim;
 import 'package:gcube3/globals/font_sizes.dart' as ft;
 import 'package:gcube3/tools/layout_tools.dart' as lt;
+import 'package:gcube3/tools/sum_array.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:xml/xml.dart' as xml;
 
 void encoder() {
   state.rebuildMainStack(() {
@@ -60,6 +62,8 @@ class _EncoderWindow extends State<EncoderWindow> {
   int _selectedRow = -1;
 
   String _sortBy = "default";
+
+  String _exportFormat = "xml";
 
   @override
   Widget build(BuildContext context) {
@@ -358,28 +362,98 @@ class _EncoderWindow extends State<EncoderWindow> {
                                                                   messageAccept: "Exporter",
                                                                   messageDecline: "Anuller",
                                                                   onAccept: () {
-                                                                    state.rebuildMainStack(() async {
-                                                                      try {
-                                                                        await SharePlus.instance.share(
-                                                                          ShareParams(
-                                                                            files: [
-                                                                              XFile.fromData(
-                                                                                utf8.encode("tHIS IS A TEST"),
-                                                                                name: "it.csv",//TODO
-                                                                                mimeType: 'text/plain',
-                                                                              ),
-                                                                            ],
-                                                                            downloadFallbackEnabled: true,
-                                                                          ),
-                                                                        );
-                                                                      } catch (e) {
-                                                                        log.print("Error: Sharing of anaPt pdf failed: ${e.toString()})");
-                                                                      }
-                                                                      setState(() {
-                                                                        stack.data.pop("export Tree Row");
-                                                                        _selectedRow = -1;
-                                                                      });
-                                                                    });
+                                                                    Platform.isIOS || Platform.isAndroid
+                                                                        ? state.rebuildMainStack(() async {
+                                                                            String dir = "/storage/emulated/0/Download";
+                                                                            /*if (Platform.isIOS) {
+                                                                          dir = (await getApplicationDocumentsDirectory()).path;
+                                                                        }*/
+                                                                            if (_exportFormat == "csv") {
+                                                                              try {
+                                                                                File tmp = File("$dir/liste.csv");
+                                                                                await tmp.writeAsString(_getListAsCSV(), flush: true);
+                                                                                await SharePlus.instance.share(
+                                                                                  ShareParams(text: "Liste d'Arbres", files: [XFile(tmp.path)]),
+                                                                                );
+                                                                                await tmp.delete();
+                                                                              } catch (e) {
+                                                                                log.print("Error: Sharing of CSV failed: ${e.toString()})");
+                                                                              }
+                                                                            } else if (_exportFormat == "xml") {
+                                                                              try {
+                                                                                File tmp = File("$dir/liste.xml");
+                                                                                await tmp.writeAsString(_getListAsXML(), flush: true);
+                                                                                await SharePlus.instance.share(
+                                                                                  ShareParams(text: "Liste d'Arbres", files: [XFile(tmp.path)]),
+                                                                                );
+                                                                                await tmp.delete();
+                                                                              } catch (e) {
+                                                                                log.print("Error: Sharing of XML failed: ${e.toString()})");
+                                                                              }
+                                                                            }
+                                                                            setState(() {
+                                                                              stack.data.pop("export Tree Row");
+                                                                              _selectedRow = -1;
+                                                                            });
+                                                                          })
+                                                                        : state.rebuildMainStack(() async {
+                                                                            String dir = "./";
+                                                                            if (_exportFormat == "csv") {
+                                                                              try {
+                                                                                File file = File("$dir/liste.csv");
+                                                                                await file.writeAsString(_getListAsCSV(), flush: true);
+                                                                                popupMessage(
+                                                                                  width: dsp.eqPx * 100,
+                                                                                  height: dsp.eqPx * 100,
+                                                                                  id: "export finished",
+                                                                                  title: "Export",
+                                                                                  messageAccept: "Ok",
+                                                                                  onAccept: () {},
+                                                                                  message: "L'export à réussi. Le fichier est enregistré.",
+                                                                                );
+                                                                              } catch (e) {
+                                                                                log.print("Error: Writing of CSV failed: ${e.toString()})");
+                                                                                popupMessage(
+                                                                                  width: dsp.eqPx * 100,
+                                                                                  height: dsp.eqPx * 100,
+                                                                                  id: "export finished",
+                                                                                  title: "Export",
+                                                                                  messageAccept: "Ok",
+                                                                                  onAccept: () {},
+                                                                                  message: "L'export à échoué.",
+                                                                                );
+                                                                              }
+                                                                            } else if (_exportFormat == "xml") {
+                                                                              try {
+                                                                                File file = File("$dir/liste.xml");
+                                                                                await file.writeAsString(_getListAsXML(), flush: true);
+                                                                                popupMessage(
+                                                                                  width: dsp.eqPx * 100,
+                                                                                  height: dsp.eqPx * 100,
+                                                                                  id: "export finished",
+                                                                                  title: "Export",
+                                                                                  messageAccept: "Ok",
+                                                                                  onAccept: () {},
+                                                                                  message: "L'export à réussi. Le fichier est enregistré.",
+                                                                                );
+                                                                              } catch (e) {
+                                                                                log.print("Error: Writing of XML failed: ${e.toString()})");
+                                                                                popupMessage(
+                                                                                  width: dsp.eqPx * 100,
+                                                                                  height: dsp.eqPx * 100,
+                                                                                  id: "export finished",
+                                                                                  title: "Export",
+                                                                                  messageAccept: "Ok",
+                                                                                  onAccept: () {},
+                                                                                  message: "L'export à échoué.",
+                                                                                );
+                                                                              }
+                                                                            }
+                                                                            setState(() {
+                                                                              stack.data.pop("export Tree Row");
+                                                                              _selectedRow = -1;
+                                                                            });
+                                                                          });
                                                                   },
                                                                   onDecline: () {
                                                                     state.rebuildMainStack(() {
@@ -395,7 +469,11 @@ class _EncoderWindow extends State<EncoderWindow> {
                                                                       });
                                                                     });
                                                                   },
-                                                                  child: Container(),
+                                                                  child: SelectFormat((String value) {
+                                                                    setState(() {
+                                                                      _exportFormat = value;
+                                                                    });
+                                                                  }),
                                                                 );
                                                               });
                                                             },
@@ -403,7 +481,7 @@ class _EncoderWindow extends State<EncoderWindow> {
                                                               children: [
                                                                 Container(
                                                                   alignment: Alignment(0, 0),
-                                                                  child: Icon(Icons.share, size: dsp.eqPx * ft.l, color: color.black),
+                                                                  child: Icon(Platform.isIOS || Platform.isAndroid ? Icons.share:Icons.save, size: dsp.eqPx * ft.l, color: color.black),
                                                                 ),
                                                               ],
                                                             ),
@@ -483,6 +561,24 @@ class _EncoderWindow extends State<EncoderWindow> {
     );
   }
 
+  String _getListAsXML() {
+    xml.XmlBuilder it = xml.XmlBuilder();
+    for (EncoderRow row in GcubeProject.selected.encodedTrees) {
+      it.element("#", nest: row.rowNr);
+      it.element("Essence", nest: essences[row.essenceId]!.name);
+      it.element(
+        "Classe de circonference[cm]",
+        nest: "${classesCirconference[row.perimeterclass]![0]}-${classesCirconference[row.perimeterclass]![1]}",
+      );
+      it.element("Volume[m³]", nest: row.computeVolume());
+    }
+    return it.buildDocument().toXmlString(pretty: true);
+  }
+
+  String _getListAsCSV() {
+    return "#,Essence,Classe de circonference[cm],Volume[m³]\n${GcubeProject.selected.encodedTrees.map((e) => "${e.rowNr},${essences[e.essenceId]!.name},${classesCirconference[e.perimeterclass]![0]}-${classesCirconference[e.perimeterclass]![1]},${e.computeVolume()}").join("\n")}";
+  }
+
   void _sortEssencesList() {
     switch (_sortBy) {
       case "order":
@@ -533,6 +629,7 @@ class _EncoderWindow extends State<EncoderWindow> {
   }
 
   Widget _buildRow(EncoderRow? row, int index) {
+    const List<int> widthCol = [15, 5, 45, 5, 55, 5, 45];
     return row != null
         ? TextButton(
             onPressed: () {
@@ -553,13 +650,13 @@ class _EncoderWindow extends State<EncoderWindow> {
               child: lt.GcubeScrollView(
                 horizontal: true,
                 height: dsp.eqPx * 30,
-                width: dsp.eqPx * 190,
+                width: dsp.eqPx * sumArray(widthCol),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       alignment: Alignment.center,
-                      width: dsp.eqPx * 30,
+                      width: dsp.eqPx * widthCol[0],
                       height: dsp.eqPx * 30,
                       child: Text(
                         row.rowNr.toString(),
@@ -567,9 +664,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                         textAlign: TextAlign.center,
                       ),
                     ),
+                    SizedBox(width: dsp.eqPx * widthCol[1]),
                     Container(
                       alignment: Alignment.center,
-                      width: dsp.eqPx * 50,
+                      width: dsp.eqPx * widthCol[2],
                       height: dsp.eqPx * 30,
                       child: Text(
                         row.essenceId != "" ? essences[row.essenceId]!.name : "no essence ?",
@@ -577,10 +675,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: dsp.eqPx * 5),
+                    SizedBox(width: dsp.eqPx * widthCol[3]),
                     Container(
                       alignment: Alignment.center,
-                      width: dsp.eqPx * 50,
+                      width: dsp.eqPx * widthCol[4],
                       height: dsp.eqPx * 30,
                       child: Text(
                         row.perimeterclass > -1
@@ -590,10 +688,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(width: dsp.eqPx * 5),
+                    SizedBox(width: dsp.eqPx * widthCol[5]),
                     Container(
                       alignment: Alignment.center,
-                      width: dsp.eqPx * 50,
+                      width: dsp.eqPx * widthCol[6],
                       height: dsp.eqPx * 30,
                       child: Text(
                         row.computeVolume().toString(),
@@ -616,13 +714,13 @@ class _EncoderWindow extends State<EncoderWindow> {
             child: lt.GcubeScrollView(
               horizontal: true,
               height: dsp.eqPx * 30,
-              width: dsp.eqPx * 190,
+              width: dsp.eqPx * sumArray(widthCol),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                     alignment: Alignment.center,
-                    width: dsp.eqPx * 30,
+                    width: dsp.eqPx * widthCol[0],
                     height: dsp.eqPx * 30,
                     child: TextButton(
                       onPressed: () {
@@ -652,9 +750,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                       ),
                     ),
                   ),
+                  SizedBox(width: dsp.eqPx * widthCol[1]),
                   Container(
                     alignment: Alignment.center,
-                    width: dsp.eqPx * 50,
+                    width: dsp.eqPx * widthCol[2],
                     height: dsp.eqPx * 30,
                     child: TextButton(
                       onPressed: () {
@@ -676,7 +775,7 @@ class _EncoderWindow extends State<EncoderWindow> {
                             alignment: Alignment.center,
                             child: Text(
                               "Essence",
-                              style: TextStyle(color: Colors.white, fontSize: ft.s * dsp.eqPx),
+                              style: TextStyle(color: Colors.white, fontSize: ft.xs * dsp.eqPx),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -684,10 +783,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                       ),
                     ),
                   ),
-                  SizedBox(width: dsp.eqPx * 5),
+                  SizedBox(width: dsp.eqPx * widthCol[3]),
                   Container(
                     alignment: Alignment.center,
-                    width: dsp.eqPx * 50,
+                    width: dsp.eqPx * widthCol[4],
                     height: dsp.eqPx * 30,
                     child: TextButton(
                       onPressed: () {
@@ -721,10 +820,10 @@ class _EncoderWindow extends State<EncoderWindow> {
                       ),
                     ),
                   ),
-                  SizedBox(width: dsp.eqPx * 5),
+                  SizedBox(width: dsp.eqPx * widthCol[5]),
                   Container(
                     alignment: Alignment.center,
-                    width: dsp.eqPx * 50,
+                    width: dsp.eqPx * widthCol[6],
                     height: dsp.eqPx * 30,
                     child: TextButton(
                       onPressed: () {
@@ -762,6 +861,82 @@ class _EncoderWindow extends State<EncoderWindow> {
               ),
             ),
           );
+  }
+}
+
+class SelectFormat extends StatefulWidget {
+  const SelectFormat(this.onValueChanged, {super.key});
+
+  final void Function(String) onValueChanged;
+
+  @override
+  State<StatefulWidget> createState() => _SelectFormat();
+}
+
+class _SelectFormat extends State<SelectFormat> {
+  String _format = "xml";
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      child: lt.GcubeScrollView(
+        height: dsp.eqPx * 50,
+        width: dsp.eqPx * 75,
+        horizontal: true,
+        child: Row(
+          children: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  widget.onValueChanged("xml");
+                  _format = "xml";
+                });
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: Icon(Icons.data_array_outlined, color: _format == "xml" ? color.agroBioTech : color.white, size: ft.xxl * dsp.eqPx),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      "xml",
+                      style: TextStyle(color: _format == "xml" ? color.agroBioTech : color.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  widget.onValueChanged("csv");
+                  _format = "csv";
+                });
+              },
+              child: Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    child: Icon(Icons.data_array_outlined, color: _format == "csv" ? color.agroBioTech : color.white, size: ft.xxl * dsp.eqPx),
+                  ),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      "csv",
+                      style: TextStyle(color: _format == "csv" ? color.agroBioTech : color.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
