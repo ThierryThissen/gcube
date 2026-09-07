@@ -5,7 +5,6 @@ import 'package:gcube3/screens/new_project.dart';
 import 'package:gcube3/screens/encoder.dart';
 import 'package:gcube3/tools/stack_animated.dart' as stack;
 import 'package:gcube3/globals/display.dart' as dsp;
-import 'package:gcube3/globals/classes_circonference.dart' as circ;
 import 'package:gcube3/globals/mode.dart' as mode;
 
 class Gcube extends StatefulWidget {
