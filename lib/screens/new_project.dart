@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gcube3/globals/colors.dart' as colors;
 import 'package:gcube3/globals/font_sizes.dart' as ft;
 import 'package:gcube3/globals/gcube_assets.dart';
 import 'package:gcube3/popup_message.dart';
@@ -9,20 +8,7 @@ import 'package:gcube3/globals/state.dart' as state;
 import 'package:gcube3/globals/display.dart' as dsp;
 import 'package:gcube3/globals/mode.dart' as mode;
 import 'package:gcube3/globals/colors.dart' as color;
-import 'package:gcube3/globals/anim_data.dart' as anim;
 import 'package:gcube3/tools/layout_tools.dart' as lt;
-
-void projects() {
-  state.rebuildMainStack(() {
-    stack.data.add(
-      "mainProjectWindow",
-      ProjectWindow("mainProjectWindow", "Mes Projets G-Cube", Duration(milliseconds: 400)),
-      Duration(milliseconds: 400),
-      anim.onScreenPosCenter,
-      anim.offScreenPosWindows,
-    );
-  });
-}
 
 class ProjectWindow extends StatefulWidget implements stack.AnimatedWindowGCube {
   final String id;
@@ -58,8 +44,8 @@ class _ProjectWindow extends State<ProjectWindow> {
           : AlignmentGeometry.xy(dsp.data.alignX(dsp.data.eqAlignLeft), dsp.data.alignY(dsp.data.eqAlignTop)),
       child: OrientationBuilder(
         builder: (c, o) {
-          double cWidth = mode.projectWindowOpen ? dsp.data.eqMaxWindowWidth * dsp.eqPx : 150 * dsp.eqPx;
-          double cHeight = mode.projectWindowOpen ? dsp.data.eqMaxWindowHeight * dsp.eqPx : 30 * dsp.eqPx;
+          double cWidth = mode.projectWindowOpen ? dsp.data.eqMaxWindowWidth * dsp.eqPx : 80 * dsp.eqPx;
+          double cHeight = mode.projectWindowOpen ? dsp.data.eqMaxWindowHeight * dsp.eqPx : 80 * dsp.eqPx;
           cHeight -= dsp.data.insetBot;
           int cAxisCount = (dsp.eqPx * dsp.data.eqMaxWindowWidth / 150).round();
           if (cAxisCount < 2) {
@@ -76,12 +62,12 @@ class _ProjectWindow extends State<ProjectWindow> {
             height: cHeight,
             width: cWidth,
             duration: widget.duration,
-            color: Colors.transparent,
+            color: color.transparent,
             child: Card(
               margin: EdgeInsetsGeometry.zero,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadiusGeometry.circular(dsp.eqPx * 0),
-                side: BorderSide(color: color.gcube, width: dsp.eqPx * 1),
+                side: BorderSide(color: mode.projectWindowOpen || inTransitionAnimation ? color.gcube : color.transparent, width: dsp.eqPx * 1),
               ),
               color: color.background,
               child: AnimatedContainer(
@@ -134,7 +120,7 @@ class _ProjectWindow extends State<ProjectWindow> {
                                             ),
                                           ),
                                         ),
-                                        lt.stroke(dsp.eqPx * 1, dsp.eqPx * 1, colors.gcube),
+                                        lt.stroke(dsp.eqPx * 1, dsp.eqPx * 1, color.gcube),
                                         SizedBox(
                                           height: cHeight - dsp.eqPx * 25,
                                           width: cWidth,
@@ -187,18 +173,18 @@ class _ProjectWindow extends State<ProjectWindow> {
                                                                     it = value;
                                                                   });
                                                                 },
-                                                                style: TextStyle(color: colors.agroBioTech, fontSize: dsp.eqPx * ft.s),
+                                                                style: TextStyle(color: color.agroBioTech, fontSize: dsp.eqPx * ft.s),
                                                                 decoration: InputDecoration(
                                                                   hintText: "Nom du projet",
                                                                   hintStyle: TextStyle(
-                                                                    color: colors.agroBioTech.withAlpha(128),
+                                                                    color: color.agroBioTech.withAlpha(128),
                                                                     fontSize: dsp.eqPx * ft.s,
                                                                   ),
                                                                   enabledBorder: UnderlineInputBorder(
-                                                                    borderSide: BorderSide(color: colors.agroBioTech),
+                                                                    borderSide: BorderSide(color: color.agroBioTech),
                                                                   ),
                                                                   focusedBorder: UnderlineInputBorder(
-                                                                    borderSide: BorderSide(color: colors.agroBioTech),
+                                                                    borderSide: BorderSide(color: color.agroBioTech),
                                                                   ),
                                                                 ),
                                                               ),
@@ -222,7 +208,7 @@ class _ProjectWindow extends State<ProjectWindow> {
                                                         color: color.background,
                                                         child: AnimatedContainer(
                                                           duration: widget.duration,
-                                                          color: mode.createProject ? colors.back.withAlpha(128) : colors.transparent,
+                                                          color: mode.createProject ? color.back.withAlpha(128) : color.transparent,
                                                           height: mode.createProject ? cpWinSide : cpWinSide * .85,
                                                           width: mode.createProject ? cpWinSide : cpWinSide * .85,
                                                           child: Stack(
@@ -230,13 +216,13 @@ class _ProjectWindow extends State<ProjectWindow> {
                                                             children: [
                                                               Container(
                                                                 alignment: Alignment.topCenter,
-                                                                child: Icon(Icons.add, color: colors.agroBioTech, size: cpWinSide * .75),
+                                                                child: Icon(Icons.add, color: color.agroBioTech, size: cpWinSide * .75),
                                                               ),
                                                               Container(
                                                                 alignment: Alignment.bottomCenter,
                                                                 child: Text(
                                                                   "Ajouter",
-                                                                  style: lt.capitalAfter(size: cpWinSide * .1, color: colors.agroBioTech),
+                                                                  style: lt.capitalAfter(size: cpWinSide * .1, color: color.agroBioTech),
                                                                 ),
                                                               ),
                                                             ],
@@ -247,113 +233,27 @@ class _ProjectWindow extends State<ProjectWindow> {
                                                   ),
                                                 ] +
                                                 List<Widget>.generate(GcubeProject.nProjects, (int index) {
-                                                  return TextButton(
-                                                    style: lt.borderlessButton,
-                                                    onPressed: () {
-                                                      state.rebuildMainStack(() {
-                                                        setState(() {
-                                                          GcubeProject.selected = GcubeProject.allProjects[index];
-                                                        });
+                                                  return _projectTile(cpWinSide, GcubeProject.allProjects[index], () {
+                                                    state.rebuildMainStack(() {
+                                                      setState(() {
+                                                        GcubeProject.selected = GcubeProject.allProjects[index];
                                                       });
-                                                    },
-                                                    child: Container(
-                                                      alignment: Alignment.center,
-                                                      height: cpWinSide * .9,
-                                                      width: cpWinSide * .9,
-                                                      child: Card(
-                                                        margin: EdgeInsetsGeometry.zero,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadiusGeometry.circular(
-                                                            GcubeProject.selected == GcubeProject.allProjects[index] ? dsp.eqPx * 0 : dsp.eqPx * 5,
-                                                          ),
-                                                          side: BorderSide(color: color.uliege, width: dsp.eqPx * 1),
-                                                        ),
-                                                        color: color.background,
-                                                        child: AnimatedContainer(
-                                                          duration: widget.duration,
-                                                          color: GcubeProject.selected == GcubeProject.allProjects[index]
-                                                              ? colors.back.withAlpha(128)
-                                                              : colors.transparent,
-                                                          height: GcubeProject.selected == GcubeProject.allProjects[index]
-                                                              ? cpWinSide
-                                                              : cpWinSide * .85,
-                                                          width: GcubeProject.selected == GcubeProject.allProjects[index]
-                                                              ? cpWinSide
-                                                              : cpWinSide * .85,
-                                                          alignment: Alignment.center,
-                                                          child: Card(
-                                                            margin: EdgeInsetsGeometry.zero,
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadiusGeometry.circular(dsp.eqPx * 5),
-                                                              side: BorderSide(color: color.uliege, width: dsp.eqPx * .5),
-                                                            ),
-                                                            color: color.background,
-                                                            child: AnimatedContainer(
-                                                              duration: widget.duration,
-                                                              height: cpWinSide * .9,
-                                                              width: cpWinSide * .9,
-                                                              child: Stack(
-                                                                alignment: AlignmentGeometry.center,
-                                                                children: [
-                                                                  Container(
-                                                                    alignment: Alignment.topCenter,
-                                                                    child: Text(
-                                                                      GcubeProject.allProjects[index].name[0].toUpperCase(),
-                                                                      style: lt.capitalFirst(size: cpWinSide * .35, color: colors.agroBioTech),
-                                                                    ),
-                                                                  ),
-                                                                  Container(
-                                                                    alignment: Alignment.bottomCenter,
-                                                                    child: Text(
-                                                                      GcubeProject.allProjects[index].name,
-                                                                      style: lt.capitalAfter(size: cpWinSide * .1, color: colors.agroBioTech),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
+                                                    });
+                                                  });
                                                 }),
                                           ),
                                         ),
                                       ],
                                     ),
                                   )
-                                : SizedBox(
-                                    height: cHeight,
-                                    width: cWidth,
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          height: dsp.eqPx * 30,
-                                          width: dsp.eqPx * 150,
-                                          child: lt.GcubeScrollView(
-                                            horizontal: true,
-                                            scrollbar: false,
-                                            child: TextButton(
-                                              onPressed: () {
-                                                state.rebuildMainStack(() {
-                                                  mode.projectWindowOpen = true;
-                                                  inTransitionAnimation = true;
-                                                });
-                                              },
-                                              child: Container(
-                                                alignment: Alignment.centerLeft,
-                                                height: dsp.eqPx * 30,
-                                                width: dsp.eqPx * 150,
-                                                child: Text(GcubeProject.selected.name, style: lt.titleL()),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                : _projectTile(cHeight, GcubeProject.selected, () {
+                                    state.rebuildMainStack(() {
+                                      setState(() {
+                                        mode.projectWindowOpen = true;
+                                        inTransitionAnimation = true;
+                                      });
+                                    });
+                                  }),
                           ),
                         ],
                       ),
@@ -363,6 +263,65 @@ class _ProjectWindow extends State<ProjectWindow> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _projectTile(double cpWinSide, GcubeProject current, void Function() onPressed) {
+    return TextButton(
+      style: lt.borderlessButton,
+      onPressed: onPressed,
+      child: Container(
+        alignment: Alignment.center,
+        height: cpWinSide * .9,
+        width: cpWinSide * .9,
+        child: Card(
+          margin: EdgeInsetsGeometry.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(GcubeProject.selected == current ? dsp.eqPx * 0 : dsp.eqPx * 5),
+            side: BorderSide(color: color.uliege, width: dsp.eqPx * 1),
+          ),
+          color: color.transparent,
+          child: AnimatedContainer(
+            duration: widget.duration * .25,
+            color: GcubeProject.selected == current ? color.agroBioTech : color.transparent,
+            height: GcubeProject.selected == current ? cpWinSide : cpWinSide * .85,
+            width: GcubeProject.selected == current ? cpWinSide : cpWinSide * .85,
+            alignment: Alignment.center,
+            child: Card(
+              margin: EdgeInsetsGeometry.zero,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(dsp.eqPx * 0),
+                side: BorderSide(color: color.transparent, width: dsp.eqPx * .0),
+              ),
+              color: color.background,
+              child: AnimatedContainer(
+                duration: widget.duration,
+                height: cpWinSide * .9,
+                width: cpWinSide * .9,
+                child: Stack(
+                  alignment: AlignmentGeometry.center,
+                  children: [
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        current.name[0].toUpperCase(),
+                        style: lt.capitalFirst(size: cpWinSide * .35, color: color.agroBioTech),
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      child: Text(
+                        current.name,
+                        style: lt.capitalAfter(size: cpWinSide * .1, color: color.agroBioTech),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

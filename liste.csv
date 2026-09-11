@@ -1,3 +1,10 @@
-#,Essence,Classe de circonference[cm],Volume[m³]
-1,Chêne,60-69,64.5
-2,Chêne,80-89,84.5
+#, uuid, essence, circonference[cm], hauteur, cone, volume[m³]
+5,Instance of 'UuidV4',Pin,70-79,-1.0,-1.0,2.98
+4,Instance of 'UuidV4',Pin,70-79,-1.0,-1.0,2.98
+3,Instance of 'UuidV4',Pin,70-79,-1.0,-1.0,2.98
+2,Instance of 'UuidV4',Pin,80-89,-1.0,-1.0,3.38
+1,Instance of 'UuidV4',Pin,70-79,-1.0,-1.0,2.98
+6,659c5ebe-6a10-445f-9aba-36da2e6f7d74,Pin,40-49,10.5,0.2,93.45
+7,d376f1dd-e85b-4111-ab77-f38fcc75322d,Pin,30-39,11.0,0.1,151.79999999999998
+8,79d8e3db-302e-4510-9fd3-b96afc0b881d,Pin,40-49,10.5,0.1,186.9
+9,dde00b1e-8745-47a9-976a-b2521e6dcad2,Pin,40-49,10.5,0.1,186.9

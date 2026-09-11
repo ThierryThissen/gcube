@@ -3,9 +3,13 @@ import 'package:gcube3/globals/colors.dart' as color;
 import 'package:gcube3/globals/state.dart' as state;
 import 'package:gcube3/screens/new_project.dart';
 import 'package:gcube3/screens/encoder.dart';
+import 'package:gcube3/screens/project_settings.dart';
+import 'package:gcube3/tools/gcube_project.dart';
 import 'package:gcube3/tools/stack_animated.dart' as stack;
 import 'package:gcube3/globals/display.dart' as dsp;
 import 'package:gcube3/globals/mode.dart' as mode;
+
+//TODO Make data persistent
 
 class Gcube extends StatefulWidget {
   const Gcube({super.key});
@@ -51,8 +55,9 @@ class _Gcube extends State<Gcube> {
         body: Stack(
           children:
               <Widget>[
-                if (!mode.encoderWindowOpen) ProjectWindow("", "", Duration(seconds: 1)),
-                if (!mode.projectWindowOpen) EncoderWindow("", "", Duration(seconds: 1)),
+                if (!mode.encoderWindowOpen && !mode.settingsWindowOpen) ProjectWindow("", "", Duration(milliseconds: 500)),
+                if (!GcubeProject.isNoneSelected && !mode.projectWindowOpen) EncoderWindow("", "", Duration(milliseconds: 500)),
+                if (!GcubeProject.isNoneSelected && !mode.projectWindowOpen) SettingsWindow("", "", Duration(milliseconds: 500)),
               ].reversed.toList() +
               stack.data.widgets,
         ),

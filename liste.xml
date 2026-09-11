@@ -1,8 +1,35 @@
-<#>1</#>
-<Essence>Chêne</Essence>
-<Classe de circonference[cm]>60-69</Classe de circonference[cm]>
-<Volume[m³]>64.5</Volume[m³]>
+<#>5</#>
+<uuid>Instance of 'UuidV4'</uuid>
+<essence>Pin</essence>
+<circonference[cm]>70-79</circonference[cm]>
+<hauteur>-1.0</hauteur>
+<cone>-1.0</cone>
+<volume[m³]>2.98</volume[m³]>
+<#>4</#>
+<uuid>Instance of 'UuidV4'</uuid>
+<essence>Pin</essence>
+<circonference[cm]>70-79</circonference[cm]>
+<hauteur>-1.0</hauteur>
+<cone>-1.0</cone>
+<volume[m³]>2.98</volume[m³]>
+<#>3</#>
+<uuid>Instance of 'UuidV4'</uuid>
+<essence>Pin</essence>
+<circonference[cm]>70-79</circonference[cm]>
+<hauteur>-1.0</hauteur>
+<cone>-1.0</cone>
+<volume[m³]>2.98</volume[m³]>
 <#>2</#>
-<Essence>Chêne</Essence>
-<Classe de circonference[cm]>80-89</Classe de circonference[cm]>
-<Volume[m³]>84.5</Volume[m³]>
+<uuid>Instance of 'UuidV4'</uuid>
+<essence>Pin</essence>
+<circonference[cm]>80-89</circonference[cm]>
+<hauteur>-1.0</hauteur>
+<cone>-1.0</cone>
+<volume[m³]>3.38</volume[m³]>
+<#>1</#>
+<uuid>Instance of 'UuidV4'</uuid>
+<essence>Pin</essence>
+<circonference[cm]>70-79</circonference[cm]>
+<hauteur>-1.0</hauteur>
+<cone>-1.0</cone>
+<volume[m³]>2.98</volume[m³]>

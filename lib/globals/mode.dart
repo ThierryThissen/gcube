@@ -16,7 +16,15 @@ bool square = false;
 bool tablet = false;
 bool projectWindowOpen = true;
 bool encoderWindowOpen = false;
+bool settingsWindowOpen = false;
 bool createProject = false;
+
+int equationType = 1;
+String exportType = "csv";
+bool addObservationNrToExport = true;
+bool addUUIDToExport = false;
+
+
 
 void serialize() async {
   //await shared!.setBool('Modes.essence', essence);
